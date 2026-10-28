@@ -142,25 +142,4 @@ wp agentpress logs --limit=25
 wp agentpress memory --post_type=post --limit=5 --format=json
 ```
 
----
-
-## 6. Local Docker Development Environment
-
-A complete Docker Compose stack (`MariaDB 10.11` + `WordPress PHP 8.2` + automated `WP-CLI` bootstrapper) is included in [`docker-compose.yml`](./docker-compose.yml).
-
-```bash
-# Start MariaDB, WordPress (port 8080), and auto-activate AgentPress
-docker compose up -d
-
-# Run WP-CLI commands inside the container
-docker compose run --rm wpcli wp agentpress key-generate "Local Test Agent" --user=admin --permissions=read,write,admin
-docker compose run --rm wpcli wp agentpress key-list
-docker compose run --rm wpcli wp agentpress logs
-```
-
-- **WordPress Site**: `http://localhost:8080`
-- **WP Admin Dashboard**: `http://localhost:8080/wp-admin/admin.php?page=agentpress` (`admin` / `admin`)
-- **REST Memory Endpoint**: `http://localhost:8080/wp-json/agentpress/v1/memory`
-- **MCP Endpoint**: `http://localhost:8080/wp-json/agentpress/v1/mcp`
-
 

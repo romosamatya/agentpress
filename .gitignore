@@ -13,3 +13,7 @@ npm-debug.log*
 .env.local
 .vscode/
 .idea/
+
+# Local Docker testing
+docker-compose*.yml
+.wp-env.json
