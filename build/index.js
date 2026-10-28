@@ -1,7 +1,7 @@
 ( function ( wp ) {
 	'use strict';
 
-	const { createElement: el, Fragment, useState, useEffect, useCallback, createRoot, render } = wp.element;
+	const { createElement: el, useState, useEffect, useCallback, createRoot, render } = wp.element;
 	const apiFetch = wp.apiFetch;
 
 	function KeysManager( { keys, users, currentUserId, loading, onRefresh } ) {
@@ -282,6 +282,186 @@
 		);
 	}
 
+	function SettingsPanel( { settings, onSaved } ) {
+		const [ defaultStatus, setDefaultStatus ] = useState( ( settings && settings.default_post_status ) || 'draft' );
+		const [ allowOverride, setAllowOverride ] = useState(
+			settings && settings.allow_status_override !== undefined ? settings.allow_status_override : true
+		);
+		const [ renderFrontend, setRenderFrontend ] = useState(
+			settings && settings.render_markdown_frontend !== undefined ? settings.render_markdown_frontend : true
+		);
+		const [ saving, setSaving ] = useState( false );
+		const [ savedNotice, setSavedNotice ] = useState( false );
+		const [ saveError, setSaveError ] = useState( null );
+
+		useEffect( () => {
+			if ( settings ) {
+				setDefaultStatus( settings.default_post_status || 'draft' );
+				setAllowOverride( settings.allow_status_override !== undefined ? settings.allow_status_override : true );
+				setRenderFrontend( settings.render_markdown_frontend !== undefined ? settings.render_markdown_frontend : true );
+			}
+		}, [ settings ] );
+
+		const handleSave = async ( e ) => {
+			e.preventDefault();
+			setSaving( true );
+			setSavedNotice( false );
+			setSaveError( null );
+			try {
+				await apiFetch( {
+					path: '/agentpress/v1/admin/settings',
+					method: 'POST',
+					data: {
+						default_post_status: defaultStatus,
+						allow_status_override: allowOverride,
+						render_markdown_frontend: renderFrontend,
+					},
+				} );
+				setSavedNotice( true );
+				if ( onSaved ) {
+					onSaved();
+				}
+				setTimeout( () => setSavedNotice( false ), 3000 );
+			} catch ( err ) {
+				setSaveError( ( err && err.message ) || 'Failed to save settings.' );
+			} finally {
+				setSaving( false );
+			}
+		};
+
+		const statusOptions = [
+			{
+				value: 'draft',
+				title: 'Save as Draft (Editorial Review)',
+				desc: 'AI-generated posts land in Drafts so a human editor can review before publishing.',
+			},
+			{
+				value: 'publish',
+				title: 'Publish Immediately (Auto-Post Live)',
+				desc: 'Hands-off automation: AI-generated articles go live on your site immediately.',
+			},
+			{
+				value: 'pending',
+				title: 'Pending Review',
+				desc: 'Places AI-generated posts into the WordPress Pending Review queue.',
+			},
+		];
+
+		return el(
+			'div',
+			{ className: 'ap-card ap-space-y' },
+			el(
+				'div',
+				null,
+				el( 'h2', { className: 'ap-card-title' }, 'AI Agent Publishing & Workflow Settings' ),
+				el(
+					'p',
+					{ className: 'ap-card-subtitle' },
+					'Choose whether posts created by external AI agents (n8n, Make.com, Ollama, Antigravity) are published live immediately or saved as drafts.'
+				)
+			),
+			savedNotice &&
+				el(
+					'div',
+					{ className: 'ap-alert-success' },
+					'Settings saved! Incoming AI agent requests will now follow this policy.'
+				),
+			saveError && el( 'div', { className: 'ap-alert-error' }, saveError ),
+			el(
+				'form',
+				{ onSubmit: handleSave, className: 'ap-space-y' },
+				el(
+					'div',
+					null,
+					el( 'label', { className: 'ap-label' }, '1. Default Post Status for AI Agents' ),
+					el(
+						'div',
+						{ className: 'ap-radio-grid' },
+						statusOptions.map( ( opt ) =>
+							el(
+								'label',
+								{
+									key: opt.value,
+									className:
+										'ap-radio-card ' +
+										( defaultStatus === opt.value ? 'ap-radio-card-active' : '' ),
+								},
+								el(
+									'div',
+									{ className: 'ap-radio-header' },
+									el( 'input', {
+										type: 'radio',
+										name: 'default_post_status',
+										value: opt.value,
+										checked: defaultStatus === opt.value,
+										onChange: () => setDefaultStatus( opt.value ),
+									} ),
+									el( 'strong', null, opt.title )
+								),
+								el( 'p', { className: 'ap-radio-desc' }, opt.desc )
+							)
+						)
+					)
+				),
+				el(
+					'div',
+					{ className: 'ap-setting-toggle' },
+					el(
+						'label',
+						{ className: 'ap-checkbox-label' },
+						el( 'input', {
+							type: 'checkbox',
+							checked: !! allowOverride,
+							onChange: ( e ) => setAllowOverride( e.target.checked ),
+						} ),
+						el(
+							'span',
+							null,
+							el( 'strong', null, 'Allow API call to specify status ("status": "publish" | "draft")' ),
+							el(
+								'span',
+								{ className: 'ap-toggle-sub' },
+								' — When checked, n8n/Make can pass "status": "publish" or "status": "draft" per request (or omit it to use your Default Status above). Uncheck to strictly enforce the Default Status above for all AI bots.'
+							)
+						)
+					)
+				),
+				el(
+					'div',
+					{ className: 'ap-setting-toggle' },
+					el(
+						'label',
+						{ className: 'ap-checkbox-label' },
+						el( 'input', {
+							type: 'checkbox',
+							checked: !! renderFrontend,
+							onChange: ( e ) => setRenderFrontend( e.target.checked ),
+						} ),
+						el(
+							'span',
+							null,
+							el( 'strong', null, 'Auto-convert AI Markdown into formatted HTML for blog readers' ),
+							el(
+								'span',
+								{ className: 'ap-toggle-sub' },
+								' — Converts headings, bold text, lists, and links into clean HTML on your public blog while keeping 100% pure Markdown in the AgentPress API.'
+							)
+						)
+					)
+				),
+				el(
+					'div',
+					null,
+					el(
+						'button',
+						{ type: 'submit', disabled: saving, className: 'ap-btn-primary' },
+						saving ? 'Saving Settings...' : 'Save Publishing Settings'
+					)
+				)
+			)
+		);
+	}
+
 	function AuditLogs( { logs, total, loading, onRefresh } ) {
 		const formatBytes = ( bytes ) => {
 			const n = Number( bytes ) || 0;
@@ -395,13 +575,13 @@
 						'/memory?post_type=post&limit=10\n' +
 						'POST ' +
 						restUrl +
-						'/memory\n' +
+						'/memory   (Payload: { "title", "content_markdown", "status": "publish"|"draft", "meta" })\n' +
 						'GET  ' +
 						restUrl +
 						'/mcp\n' +
 						'POST ' +
 						restUrl +
-						'/mcp   (Tools: read_wp_memory, write_wp_draft)\n\n' +
+						'/mcp      (Tools: read_wp_memory, write_wp_draft)\n\n' +
 						'Header Required:\n' +
 						'Authorization: Bearer ap_live_<your_agentpress_api_key>'
 				)
@@ -415,6 +595,11 @@
 		const [ users, setUsers ] = useState( [] );
 		const [ logs, setLogs ] = useState( [] );
 		const [ totalLogs, setTotalLogs ] = useState( 0 );
+		const [ settings, setSettings ] = useState( {
+			default_post_status: 'draft',
+			allow_status_override: true,
+			render_markdown_frontend: true,
+		} );
 		const [ loading, setLoading ] = useState( true );
 		const [ error, setError ] = useState( null );
 
@@ -429,15 +614,19 @@
 			setLoading( true );
 			setError( null );
 			try {
-				const [ keysRes, usersRes, logsRes ] = await Promise.all( [
+				const [ keysRes, usersRes, logsRes, settingsRes ] = await Promise.all( [
 					apiFetch( { path: '/agentpress/v1/admin/keys' } ),
 					apiFetch( { path: '/agentpress/v1/admin/users' } ),
 					apiFetch( { path: '/agentpress/v1/admin/logs?limit=50' } ),
+					apiFetch( { path: '/agentpress/v1/admin/settings' } ),
 				] );
 				setKeys( ( keysRes && keysRes.keys ) || [] );
 				setUsers( ( usersRes && usersRes.users ) || [] );
 				setLogs( ( logsRes && logsRes.logs ) || [] );
 				setTotalLogs( ( logsRes && logsRes.total ) || 0 );
+				if ( settingsRes && settingsRes.settings ) {
+					setSettings( settingsRes.settings );
+				}
 			} catch ( err ) {
 				setError( ( err && err.message ) || 'Failed to load AgentPress dashboard data.' );
 			} finally {
@@ -483,6 +672,15 @@
 					'button',
 					{
 						type: 'button',
+						className: 'ap-tab ' + ( activeTab === 'settings' ? 'ap-tab-active' : '' ),
+						onClick: () => setActiveTab( 'settings' ),
+					},
+					'Publishing Settings (' + ( settings.default_post_status || 'draft' ).toUpperCase() + ')'
+				),
+				el(
+					'button',
+					{
+						type: 'button',
 						className: 'ap-tab ' + ( activeTab === 'logs' ? 'ap-tab-active' : '' ),
 						onClick: () => setActiveTab( 'logs' ),
 					},
@@ -505,6 +703,11 @@
 					currentUserId: config.currentUserId,
 					loading,
 					onRefresh: fetchDashboardData,
+				} ),
+			activeTab === 'settings' &&
+				el( SettingsPanel, {
+					settings,
+					onSaved: fetchDashboardData,
 				} ),
 			activeTab === 'logs' &&
 				el( AuditLogs, {

@@ -47,7 +47,35 @@ final class MemoryController extends WP_REST_Controller {
 	 *
 	 * @var array<int, string>
 	 */
-	private const ALLOWED_STATUSES = array( 'draft', 'publish', 'pending', 'private' );
+	public const ALLOWED_STATUSES = array( 'draft', 'publish', 'pending', 'private' );
+
+	/**
+	 * Option key for AgentPress publishing settings.
+	 */
+	public const SETTINGS_OPTION = 'agentpress_settings';
+
+	/**
+	 * Retrieve current AgentPress publishing settings with defaults.
+	 *
+	 * @return array{default_post_status: string, allow_status_override: bool, render_markdown_frontend: bool}
+	 */
+	public static function get_publishing_settings(): array {
+		$saved = get_option( self::SETTINGS_OPTION, array() );
+		if ( ! is_array( $saved ) ) {
+			$saved = array();
+		}
+
+		$default_status = isset( $saved['default_post_status'] ) ? sanitize_key( (string) $saved['default_post_status'] ) : 'draft';
+		if ( ! in_array( $default_status, self::ALLOWED_STATUSES, true ) ) {
+			$default_status = 'draft';
+		}
+
+		return array(
+			'default_post_status'      => $default_status,
+			'allow_status_override'    => isset( $saved['allow_status_override'] ) ? (bool) $saved['allow_status_override'] : true,
+			'render_markdown_frontend' => isset( $saved['render_markdown_frontend'] ) ? (bool) $saved['render_markdown_frontend'] : true,
+		);
+	}
 
 	/**
 	 * Constructor.
@@ -191,12 +219,20 @@ final class MemoryController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function create_or_update_memory_item( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$settings         = self::get_publishing_settings();
 		$post_id          = $request->get_param( 'id' );
 		$title            = sanitize_text_field( (string) $request->get_param( 'title' ) );
 		$content_markdown = MarkdownConverter::sanitize_markdown( (string) $request->get_param( 'content_markdown' ) );
-		$status           = sanitize_key( (string) ( $request->get_param( 'status' ) ?? 'draft' ) );
+		$requested_status = $request->get_param( 'status' );
 		$post_type        = sanitize_key( (string) ( $request->get_param( 'post_type' ) ?? 'post' ) );
 		$meta             = $request->get_param( 'meta' );
+
+		// Determine effective post status from Dashboard Settings + optional API override.
+		if ( ! $settings['allow_status_override'] || null === $requested_status || '' === trim( (string) $requested_status ) ) {
+			$status = $settings['default_post_status'];
+		} else {
+			$status = sanitize_key( (string) $requested_status );
+		}
 
 		if ( '' === $title ) {
 			return new WP_Error(
@@ -233,9 +269,13 @@ final class MemoryController extends WP_REST_Controller {
 		$current_key   = $this->authenticator->get_current_key();
 		$agent_user_id = isset( $current_key['agent_user_id'] ) ? (int) $current_key['agent_user_id'] : get_current_user_id();
 
+		$post_content = $settings['render_markdown_frontend']
+			? MarkdownConverter::to_html( $content_markdown )
+			: $content_markdown;
+
 		$post_data = array(
 			'post_title'   => $title,
-			'post_content' => $content_markdown,
+			'post_content' => $post_content,
 			'post_status'  => $status,
 			'post_type'    => $post_type,
 			'post_author'  => $agent_user_id,
@@ -498,9 +538,8 @@ final class MemoryController extends WP_REST_Controller {
 				'required'    => true,
 			),
 			'status'           => array(
-				'description'       => __( 'Post publication status (draft, publish, pending, private).', 'agentpress' ),
+				'description'       => __( 'Post publication status (draft, publish, pending, private). Omit to use Dashboard default.', 'agentpress' ),
 				'type'              => 'string',
-				'default'           => 'draft',
 				'enum'              => self::ALLOWED_STATUSES,
 				'sanitize_callback' => 'sanitize_key',
 			),

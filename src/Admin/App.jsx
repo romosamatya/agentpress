@@ -3,6 +3,7 @@ import apiFetch from '@wordpress/api-fetch';
 import KeysManager from './components/KeysManager';
 import AuditLogs from './components/AuditLogs';
 import McpDocs from './components/McpDocs';
+import SettingsPanel from './components/SettingsPanel';
 
 export default function App() {
 	const [ activeTab, setActiveTab ] = useState( 'keys' );
@@ -10,6 +11,11 @@ export default function App() {
 	const [ users, setUsers ] = useState( [] );
 	const [ logs, setLogs ] = useState( [] );
 	const [ totalLogs, setTotalLogs ] = useState( 0 );
+	const [ settings, setSettings ] = useState( {
+		default_post_status: 'draft',
+		allow_status_override: true,
+		render_markdown_frontend: true,
+	} );
 	const [ loading, setLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
 
@@ -24,15 +30,19 @@ export default function App() {
 		setLoading( true );
 		setError( null );
 		try {
-			const [ keysRes, usersRes, logsRes ] = await Promise.all( [
+			const [ keysRes, usersRes, logsRes, settingsRes ] = await Promise.all( [
 				apiFetch( { path: '/agentpress/v1/admin/keys' } ),
 				apiFetch( { path: '/agentpress/v1/admin/users' } ),
 				apiFetch( { path: '/agentpress/v1/admin/logs?limit=50' } ),
+				apiFetch( { path: '/agentpress/v1/admin/settings' } ),
 			] );
 			setKeys( keysRes?.keys || [] );
 			setUsers( usersRes?.users || [] );
 			setLogs( logsRes?.logs || [] );
 			setTotalLogs( logsRes?.total || 0 );
+			if ( settingsRes?.settings ) {
+				setSettings( settingsRes.settings );
+			}
 		} catch ( err ) {
 			setError( err?.message || 'Failed to load AgentPress dashboard data.' );
 		} finally {
@@ -118,6 +128,17 @@ export default function App() {
 				</button>
 				<button
 					type="button"
+					onClick={ () => setActiveTab( 'settings' ) }
+					className={ `px-4 py-2.5 font-medium text-sm rounded-t-lg border-0 cursor-pointer transition-colors ${
+						activeTab === 'settings'
+							? 'bg-white text-slate-900 border-b-2 border-emerald-600 shadow-sm font-semibold'
+							: 'bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+					}` }
+				>
+					Publishing Settings ({ settings.default_post_status.toUpperCase() })
+				</button>
+				<button
+					type="button"
 					onClick={ () => setActiveTab( 'mcp' ) }
 					className={ `px-4 py-2.5 font-medium text-sm rounded-t-lg border-0 cursor-pointer transition-colors ${
 						activeTab === 'mcp'
@@ -146,6 +167,13 @@ export default function App() {
 					total={ totalLogs }
 					loading={ loading }
 					onRefresh={ fetchDashboardData }
+				/>
+			) }
+
+			{ activeTab === 'settings' && (
+				<SettingsPanel
+					settings={ settings }
+					onSaved={ fetchDashboardData }
 				/>
 			) }
 

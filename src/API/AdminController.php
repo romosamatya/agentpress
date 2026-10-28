@@ -133,6 +133,23 @@ final class AdminController extends WP_REST_Controller {
 				),
 			)
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/settings',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_settings' ),
+					'permission_callback' => array( $this, 'check_admin_permission' ),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'update_settings' ),
+					'permission_callback' => array( $this, 'check_admin_permission' ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -265,5 +282,60 @@ final class AdminController extends WP_REST_Controller {
 		);
 
 		return new WP_REST_Response( array( 'users' => $formatted ), 200 );
+	}
+
+	/**
+	 * Retrieve current AgentPress publishing settings for the React dashboard.
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function get_settings(): WP_REST_Response {
+		return new WP_REST_Response(
+			array(
+				'settings' => MemoryController::get_publishing_settings(),
+			),
+			200
+		);
+	}
+
+	/**
+	 * Update AgentPress publishing settings from the React dashboard.
+	 *
+	 * @param WP_REST_Request $request Incoming REST request.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function update_settings( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$current = MemoryController::get_publishing_settings();
+
+		$default_status = $request->get_param( 'default_post_status' );
+		if ( null !== $default_status ) {
+			$clean_status = sanitize_key( (string) $default_status );
+			if ( ! in_array( $clean_status, MemoryController::ALLOWED_STATUSES, true ) ) {
+				return new WP_Error(
+					'agentpress_invalid_default_status',
+					__( 'Invalid default post status. Choose draft, publish, pending, or private.', 'agentpress' ),
+					array( 'status' => 400 )
+				);
+			}
+			$current['default_post_status'] = $clean_status;
+		}
+
+		if ( null !== $request->get_param( 'allow_status_override' ) ) {
+			$current['allow_status_override'] = (bool) $request->get_param( 'allow_status_override' );
+		}
+
+		if ( null !== $request->get_param( 'render_markdown_frontend' ) ) {
+			$current['render_markdown_frontend'] = (bool) $request->get_param( 'render_markdown_frontend' );
+		}
+
+		update_option( MemoryController::SETTINGS_OPTION, $current );
+
+		return new WP_REST_Response(
+			array(
+				'settings' => $current,
+				'saved'    => true,
+			),
+			200
+		);
 	}
 }

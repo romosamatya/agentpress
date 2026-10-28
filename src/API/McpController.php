@@ -252,9 +252,6 @@ final class McpController extends WP_REST_Controller {
 			foreach ( $arguments as $k => $v ) {
 				$sub_request->set_param( (string) $k, $v );
 			}
-			if ( ! isset( $arguments['status'] ) ) {
-				$sub_request->set_param( 'status', 'draft' );
-			}
 
 			$result = $this->memory_controller->create_or_update_memory_item( $sub_request );
 			if ( is_wp_error( $result ) ) {

@@ -203,4 +203,134 @@ final class MarkdownConverter {
 
 		return trim( $clean );
 	}
+
+	/**
+	 * Convert sanitized Markdown into clean semantic HTML for WordPress frontend display.
+	 *
+	 * @param string $markdown Clean Markdown string.
+	 * @return string Semantic HTML safe for `post_content`.
+	 */
+	public static function to_html( string $markdown ): string {
+		$text = self::sanitize_markdown( $markdown );
+		if ( '' === $text ) {
+			return '';
+		}
+
+		// Extract fenced code blocks first to protect their contents.
+		$code_blocks = array();
+		$text        = (string) preg_replace_callback(
+			'/```([a-zA-Z0-9_-]*)\n(.*?)```/s',
+			static function ( array $matches ) use ( &$code_blocks ): string {
+				$placeholder                 = '%%AGENTPRESS_CODE_' . count( $code_blocks ) . '%%';
+				$escaped_code                = esc_html( trim( $matches[2] ) );
+				$code_blocks[ $placeholder ] = '<pre><code>' . $escaped_code . '</code></pre>';
+				return "\n\n" . $placeholder . "\n\n";
+			},
+			$text
+		);
+
+		$blocks     = preg_split( "/\n{2,}/", $text ) ?: array();
+		$html_parts = array();
+
+		foreach ( $blocks as $block ) {
+			$block = trim( $block );
+			if ( '' === $block ) {
+				continue;
+			}
+
+			if ( isset( $code_blocks[ $block ] ) ) {
+				$html_parts[] = $code_blocks[ $block ];
+				continue;
+			}
+
+			// Headings (# through ######).
+			if ( preg_match( '/^(#{1,6})\s+(.+)$/m', $block, $h_match ) && ! str_contains( $block, "\n" ) ) {
+				$level        = strlen( $h_match[1] );
+				$html_parts[] = sprintf( '<h%d>%s</h%d>', $level, self::format_inline_markdown( $h_match[2] ), $level );
+				continue;
+			}
+
+			// Horizontal rule.
+			if ( preg_match( '/^(-{3,}|\*{3,})$/', $block ) ) {
+				$html_parts[] = '<hr />';
+				continue;
+			}
+
+			// Blockquote.
+			if ( str_starts_with( $block, '>' ) ) {
+				$lines   = preg_split( '/\n/', $block ) ?: array();
+				$cleaned = array_map(
+					static fn( string $l ): string => self::format_inline_markdown( (string) preg_replace( '/^>\s?/', '', $l ) ),
+					$lines
+				);
+				$html_parts[] = '<blockquote><p>' . implode( '<br />', $cleaned ) . '</p></blockquote>';
+				continue;
+			}
+
+			// Unordered list.
+			if ( preg_match( '/^[-*]\s+/m', $block ) ) {
+				$lines = preg_split( '/\n/', $block ) ?: array();
+				$items = array();
+				foreach ( $lines as $line ) {
+					$item_text = (string) preg_replace( '/^[-*]\s+/', '', trim( $line ) );
+					if ( '' !== $item_text ) {
+						$items[] = '<li>' . self::format_inline_markdown( $item_text ) . '</li>';
+					}
+				}
+				$html_parts[] = '<ul>' . implode( '', $items ) . '</ul>';
+				continue;
+			}
+
+			// Ordered list.
+			if ( preg_match( '/^\d+\.\s+/m', $block ) ) {
+				$lines = preg_split( '/\n/', $block ) ?: array();
+				$items = array();
+				foreach ( $lines as $line ) {
+					$item_text = (string) preg_replace( '/^\d+\.\s+/', '', trim( $line ) );
+					if ( '' !== $item_text ) {
+						$items[] = '<li>' . self::format_inline_markdown( $item_text ) . '</li>';
+					}
+				}
+				$html_parts[] = '<ol>' . implode( '', $items ) . '</ol>';
+				continue;
+			}
+
+			// Standard paragraph.
+			$lines        = preg_split( '/\n/', $block ) ?: array();
+			$formatted    = array_map( array( self::class, 'format_inline_markdown' ), $lines );
+			$html_parts[] = '<p>' . implode( '<br />', $formatted ) . '</p>';
+		}
+
+		return implode( "\n\n", $html_parts );
+	}
+
+	/**
+	 * Convert inline Markdown syntax (code, links, bold, italic) to HTML.
+	 *
+	 * @param string $line Single line of text.
+	 * @return string
+	 */
+	private static function format_inline_markdown( string $line ): string {
+		$escaped = esc_html( trim( $line ) );
+
+		// Inline code: `code`.
+		$escaped = (string) preg_replace( '/`([^`]+)`/', '<code>$1</code>', $escaped );
+
+		// Links: [label](url).
+		$escaped = (string) preg_replace_callback(
+			'/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/i',
+			static function ( array $m ): string {
+				return sprintf( '<a href="%s">%s</a>', esc_url( html_entity_decode( $m[2] ) ), $m[1] );
+			},
+			$escaped
+		);
+
+		// Bold: **text**.
+		$escaped = (string) preg_replace( '/\*\*([^*]+)\*\*/', '<strong>$1</strong>', $escaped );
+
+		// Italic: *text*.
+		$escaped = (string) preg_replace( '/\*([^*]+)\*/', '<em>$1</em>', $escaped );
+
+		return $escaped;
+	}
 }
