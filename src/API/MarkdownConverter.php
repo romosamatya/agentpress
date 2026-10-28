@@ -45,7 +45,7 @@ final class MarkdownConverter {
 		$text = (string) preg_replace_callback(
 			'/<pre\b[^>]*>\s*(?:<code\b[^>]*>)?(.*?)(?:<\/code>)?\s*<\/pre>/is',
 			static function ( array $matches ): string {
-				$code = strip_tags( $matches[1] );
+				$code = wp_strip_all_tags( $matches[1], false );
 				return "\n\n```\n" . trim( $code ) . "\n```\n\n";
 			},
 			$text
@@ -55,7 +55,7 @@ final class MarkdownConverter {
 		$text = (string) preg_replace_callback(
 			'/<code\b[^>]*>(.*?)<\/code>/is',
 			static function ( array $matches ): string {
-				$code = strip_tags( $matches[1] );
+				$code = wp_strip_all_tags( $matches[1], true );
 				return '`' . trim( $code ) . '`';
 			},
 			$text
@@ -67,7 +67,7 @@ final class MarkdownConverter {
 			$text   = (string) preg_replace_callback(
 				'/<h' . $level . '\b[^>]*>(.*?)<\/h' . $level . '>/is',
 				static function ( array $matches ) use ( $hashes ): string {
-					$heading = trim( strip_tags( $matches[1] ) );
+					$heading = trim( wp_strip_all_tags( $matches[1], true ) );
 					return "\n\n{$hashes} {$heading}\n\n";
 				},
 				$text
@@ -78,8 +78,8 @@ final class MarkdownConverter {
 		$text = (string) preg_replace_callback(
 			'/<blockquote\b[^>]*>(.*?)<\/blockquote>/is',
 			static function ( array $matches ): string {
-				$inner = trim( strip_tags( $matches[1] ) );
-				$lines = preg_split( '/\r\n|\r|\n/', $inner ) ?: array();
+				$inner  = trim( wp_strip_all_tags( $matches[1], false ) );
+				$lines  = preg_split( '/\r\n|\r|\n/', $inner ) ?: array();
 				$quoted = array_map(
 					static fn( string $line ): string => '> ' . trim( $line ),
 					$lines
@@ -94,7 +94,7 @@ final class MarkdownConverter {
 			'/<a\b[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is',
 			static function ( array $matches ): string {
 				$url   = trim( $matches[1] );
-				$label = trim( strip_tags( $matches[2] ) );
+				$label = trim( wp_strip_all_tags( $matches[2], true ) );
 				if ( '' === $label ) {
 					$label = $url;
 				}
@@ -136,7 +136,7 @@ final class MarkdownConverter {
 				$items = (string) preg_replace_callback(
 					'/<li\b[^>]*>(.*?)<\/li>/is',
 					static function ( array $item_match ) use ( &$index ): string {
-						$line = trim( strip_tags( $item_match[1] ) );
+						$line = trim( wp_strip_all_tags( $item_match[1], true ) );
 						return ( $index++ ) . '. ' . $line . "\n";
 					},
 					$matches[1]
@@ -152,7 +152,7 @@ final class MarkdownConverter {
 				$items = (string) preg_replace_callback(
 					'/<li\b[^>]*>(.*?)<\/li>/is',
 					static function ( array $item_match ): string {
-						$line = trim( strip_tags( $item_match[1] ) );
+						$line = trim( wp_strip_all_tags( $item_match[1], true ) );
 						return '- ' . $line . "\n";
 					},
 					$matches[1]
@@ -169,11 +169,7 @@ final class MarkdownConverter {
 		$text = (string) preg_replace( '/<p\b[^>]*>/i', '', $text );
 
 		// 13. Strip any remaining HTML tags strictly.
-		if ( function_exists( 'wp_strip_all_tags' ) ) {
-			$text = wp_strip_all_tags( $text, false );
-		} else {
-			$text = strip_tags( $text );
-		}
+		$text = wp_strip_all_tags( $text, false );
 
 		// 14. Decode HTML entities and normalize excessive newlines.
 		$text = html_entity_decode( $text, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
@@ -198,7 +194,7 @@ final class MarkdownConverter {
 		// Strip Gutenberg comments if accidentally passed.
 		$clean = (string) preg_replace( '/<!--\s*\/?wp:.*?-->/s', '', $clean );
 		// Strip remaining raw HTML tags outside code blocks.
-		$clean = strip_tags( $clean );
+		$clean = wp_strip_all_tags( $clean, false );
 		$clean = str_replace( array( "\r\n", "\r" ), "\n", $clean );
 
 		return trim( $clean );
@@ -291,7 +287,7 @@ final class MarkdownConverter {
 						$items[] = '<li>' . self::format_inline_markdown( $item_text ) . '</li>';
 					}
 				}
-				$html_parts[] = '<ol>' . implode( '', $items ) . '</ol>';
+				$html_parts[] = '<ol>' . implode( '', $items ) . '</ul>';
 				continue;
 			}
 

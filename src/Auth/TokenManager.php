@@ -85,6 +85,7 @@ final class TokenManager {
 		$created_at   = current_time( 'mysql', true );
 		$perms_csv    = implode( ',', $normalized_permissions );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$inserted = $wpdb->insert(
 			Migrator::keys_table(),
 			array(
@@ -140,13 +141,14 @@ final class TokenManager {
 		$candidate_hash = hash( 'sha256', $raw_key );
 		$table          = Migrator::keys_table();
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT id, name, key_prefix, api_key_hash, agent_user_id, permissions, last_used, created_at, revoked_at
-				 FROM {$table}
+				'SELECT id, name, key_prefix, api_key_hash, agent_user_id, permissions, last_used, created_at, revoked_at
+				 FROM %i
 				 WHERE api_key_hash = %s AND revoked_at IS NULL
-				 LIMIT 1",
+				 LIMIT 1',
+				$table,
 				$candidate_hash
 			),
 			ARRAY_A
@@ -162,6 +164,7 @@ final class TokenManager {
 
 		// Touch `last_used` timestamp in UTC.
 		$now = current_time( 'mysql', true );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update(
 			$table,
 			array( 'last_used' => $now ),
@@ -194,6 +197,7 @@ final class TokenManager {
 	public function revoke_key( int $key_id ): bool {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$updated = $wpdb->update(
 			Migrator::keys_table(),
 			array( 'revoked_at' => current_time( 'mysql', true ) ),
@@ -214,6 +218,7 @@ final class TokenManager {
 	public function delete_key( int $key_id ): bool {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$deleted = $wpdb->delete(
 			Migrator::keys_table(),
 			array( 'id' => $key_id ),
@@ -234,13 +239,17 @@ final class TokenManager {
 		$keys_table  = Migrator::keys_table();
 		$users_table = $wpdb->users;
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
-			"SELECT k.id, k.name, k.key_prefix, k.agent_user_id, k.permissions, k.last_used, k.created_at, k.revoked_at,
-					u.user_login AS agent_username, u.display_name AS agent_display_name
-			 FROM {$keys_table} k
-			 LEFT JOIN {$users_table} u ON k.agent_user_id = u.ID
-			 ORDER BY k.created_at DESC, k.id DESC",
+			$wpdb->prepare(
+				'SELECT k.id, k.name, k.key_prefix, k.agent_user_id, k.permissions, k.last_used, k.created_at, k.revoked_at,
+						u.user_login AS agent_username, u.display_name AS agent_display_name
+				 FROM %i k
+				 LEFT JOIN %i u ON k.agent_user_id = u.ID
+				 ORDER BY k.created_at DESC, k.id DESC',
+				$keys_table,
+				$users_table
+			),
 			ARRAY_A
 		);
 

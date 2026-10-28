@@ -40,6 +40,7 @@ final class Logger {
 
 		$table = Migrator::logs_table();
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$result = $wpdb->insert(
 			$table,
 			array(
@@ -74,22 +75,25 @@ final class Logger {
 		$limit  = max( 1, min( 200, $limit ) );
 		$offset = max( 0, $offset );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$query = $wpdb->prepare(
-			"SELECT l.id, l.agent_id, l.key_id, l.endpoint, l.request_method, l.payload_size, l.status_code, l.timestamp,
-					u.user_login AS agent_username, u.display_name AS agent_display_name,
-					k.name AS key_name, k.key_prefix
-			 FROM {$logs_table} l
-			 LEFT JOIN {$users_table} u ON l.agent_id = u.ID
-			 LEFT JOIN {$keys_table} k ON l.key_id = k.id
-			 ORDER BY l.timestamp DESC, l.id DESC
-			 LIMIT %d OFFSET %d",
-			$limit,
-			$offset
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT l.id, l.agent_id, l.key_id, l.endpoint, l.request_method, l.payload_size, l.status_code, l.timestamp,
+						u.user_login AS agent_username, u.display_name AS agent_display_name,
+						k.name AS key_name, k.key_prefix
+				 FROM %i l
+				 LEFT JOIN %i u ON l.agent_id = u.ID
+				 LEFT JOIN %i k ON l.key_id = k.id
+				 ORDER BY l.timestamp DESC, l.id DESC
+				 LIMIT %d OFFSET %d',
+				$logs_table,
+				$users_table,
+				$keys_table,
+				$limit,
+				$offset
+			),
+			ARRAY_A
 		);
-
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		$rows = $wpdb->get_results( $query, ARRAY_A );
 
 		if ( ! is_array( $rows ) ) {
 			return array();
@@ -126,7 +130,9 @@ final class Logger {
 
 		$logs_table = Migrator::logs_table();
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$logs_table}" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return (int) $wpdb->get_var(
+			$wpdb->prepare( 'SELECT COUNT(*) FROM %i', $logs_table )
+		);
 	}
 }
