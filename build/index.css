@@ -1,214 +1,362 @@
-#agentpress-admin-root .ap-container {
-	max-width: 1180px;
-	margin: 20px 20px 40px 0;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-	color: #1e293b;
+#agentpress-admin-root * {
+	box-sizing: border-box;
 }
 
-#agentpress-admin-root .ap-hero {
-	background: #0f172a;
-	color: #f8fafc;
-	padding: 24px;
-	border-radius: 12px;
-	margin-bottom: 20px;
-	box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+#agentpress-admin-root .ap-shell {
+	max-width: 1120px;
+	margin: 24px 20px 48px 4px;
+	font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif;
+	color: #111827;
+	-webkit-font-smoothing: antialiased;
 }
 
-#agentpress-admin-root .ap-hero-title {
-	color: #ffffff;
-	font-size: 22px;
-	font-weight: 700;
-	margin: 0 0 6px 0;
-}
-
-#agentpress-admin-root .ap-hero-subtitle {
-	color: #cbd5e1;
-	font-size: 14px;
-	margin: 0;
-}
-
-#agentpress-admin-root .ap-tabs {
+/* Header */
+#agentpress-admin-root .ap-topbar {
 	display: flex;
-	gap: 8px;
-	border-bottom: 1px solid #cbd5e1;
-	margin-bottom: 20px;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
+	padding-bottom: 20px;
 }
 
-#agentpress-admin-root .ap-tab {
-	padding: 10px 16px;
-	border: none;
-	background: transparent;
-	color: #475569;
+#agentpress-admin-root .ap-title-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+#agentpress-admin-root .ap-title {
+	font-size: 20px;
 	font-weight: 600;
+	letter-spacing: -0.02em;
+	color: #111827;
+	margin: 0;
+	line-height: 1.3;
+}
+
+#agentpress-admin-root .ap-version {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 11px;
+	color: #6b7280;
+	background: #f3f4f6;
+	border: 1px solid #e5e7eb;
+	padding: 1px 6px;
+	border-radius: 4px;
+}
+
+#agentpress-admin-root .ap-subtitle {
+	margin: 4px 0 0 0;
 	font-size: 13px;
+	color: #6b7280;
+}
+
+#agentpress-admin-root .ap-topbar-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+#agentpress-admin-root .ap-status-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	color: #374151;
+	background: #ffffff;
+	border: 1px solid #d1d5db;
+	padding: 5px 10px;
+	border-radius: 6px;
 	cursor: pointer;
-	border-bottom: 2px solid transparent;
 }
 
-#agentpress-admin-root .ap-tab-active {
-	color: #0f172a;
+#agentpress-admin-root .ap-status-chip:hover {
+	border-color: #9ca3af;
+}
+
+#agentpress-admin-root .ap-dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+#agentpress-admin-root .ap-dot-green {
+	background: #16a34a;
+}
+
+#agentpress-admin-root .ap-dot-amber {
+	background: #d97706;
+}
+
+#agentpress-admin-root .ap-dot-gray {
+	background: #9ca3af;
+}
+
+/* Navigation */
+#agentpress-admin-root .ap-nav {
+	display: flex;
+	gap: 24px;
+	border-bottom: 1px solid #e5e7eb;
+	margin-bottom: 24px;
+}
+
+#agentpress-admin-root .ap-nav-item {
+	position: relative;
+	padding: 10px 2px 12px 2px;
+	background: none;
+	border: none;
+	font-size: 13px;
+	font-weight: 500;
+	color: #6b7280;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	transition: color 0.12s ease;
+}
+
+#agentpress-admin-root .ap-nav-item:hover {
+	color: #111827;
+}
+
+#agentpress-admin-root .ap-nav-item-active {
+	color: #111827;
+	font-weight: 600;
+}
+
+#agentpress-admin-root .ap-nav-item-active::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -1px;
+	height: 2px;
+	background: #111827;
+}
+
+#agentpress-admin-root .ap-nav-count {
+	font-size: 11px;
+	font-variant-numeric: tabular-nums;
+	color: #6b7280;
+	background: #f3f4f6;
+	padding: 1px 6px;
+	border-radius: 10px;
+}
+
+/* Panels & Surfaces */
+#agentpress-admin-root .ap-surface {
 	background: #ffffff;
-	border-bottom-color: #059669;
-	border-radius: 8px 8px 0 0;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
-#agentpress-admin-root .ap-space-y > * + * {
-	margin-top: 20px;
+#agentpress-admin-root .ap-surface + .ap-surface {
+	margin-top: 16px;
 }
 
-#agentpress-admin-root .ap-card {
-	background: #ffffff;
-	border: 1px solid #e2e8f0;
-	border-radius: 12px;
-	padding: 22px;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
-#agentpress-admin-root .ap-card-table {
-	padding: 0;
-	overflow: hidden;
-}
-
-#agentpress-admin-root .ap-card-header {
+#agentpress-admin-root .ap-surface-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 16px 22px;
-	border-bottom: 1px solid #e2e8f0;
+	padding: 14px 18px;
+	border-bottom: 1px solid #e5e7eb;
 }
 
-#agentpress-admin-root .ap-card-title {
-	font-size: 16px;
-	font-weight: 700;
+#agentpress-admin-root .ap-surface-title {
+	font-size: 14px;
+	font-weight: 600;
+	color: #111827;
 	margin: 0;
-	color: #0f172a;
 }
 
-#agentpress-admin-root .ap-card-subtitle {
+#agentpress-admin-root .ap-surface-desc {
+	font-size: 12px;
+	color: #6b7280;
+	margin: 2px 0 0 0;
+}
+
+/* Secret Key Reveal Banner */
+#agentpress-admin-root .ap-secret-banner {
+	background: #fffbeb;
+	border: 1px solid #fde68a;
+	border-radius: 8px;
+	padding: 14px 18px;
+	margin-bottom: 16px;
+}
+
+#agentpress-admin-root .ap-secret-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 	font-size: 13px;
-	color: #64748b;
-	margin: 4px 0 16px 0;
+	font-weight: 600;
+	color: #92400e;
+	margin-bottom: 4px;
 }
 
-#agentpress-admin-root .ap-form-grid {
+#agentpress-admin-root .ap-secret-sub {
+	font-size: 12px;
+	color: #b45309;
+	margin: 0 0 10px 0;
+}
+
+#agentpress-admin-root .ap-secret-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+#agentpress-admin-root .ap-secret-code {
+	flex: 1;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 12.5px;
+	background: #ffffff;
+	border: 1px solid #fcd34d;
+	color: #111827;
+	padding: 7px 12px;
+	border-radius: 6px;
+	user-select: all;
+}
+
+/* Inline Create Key Bar */
+#agentpress-admin-root .ap-create-bar {
+	padding: 16px 18px;
+	background: #f9fafb;
+	border-bottom: 1px solid #e5e7eb;
+}
+
+#agentpress-admin-root .ap-create-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-	gap: 16px;
+	grid-template-columns: 1.4fr 1fr auto auto;
+	gap: 12px;
 	align-items: end;
 }
 
-#agentpress-admin-root .ap-label {
+@media (max-width: 900px) {
+	#agentpress-admin-root .ap-create-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+#agentpress-admin-root .ap-field-label {
 	display: block;
-	font-size: 11px;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
-	color: #475569;
-	margin-bottom: 6px;
+	font-size: 12px;
+	font-weight: 500;
+	color: #374151;
+	margin-bottom: 5px;
 }
 
 #agentpress-admin-root .ap-input,
 #agentpress-admin-root .ap-select {
 	width: 100%;
-	padding: 8px 12px;
-	border: 1px solid #cbd5e1;
-	border-radius: 8px;
+	height: 34px;
+	padding: 0 10px;
 	font-size: 13px;
+	color: #111827;
+	background: #ffffff;
+	border: 1px solid #d1d5db;
+	border-radius: 6px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.02);
 }
 
-#agentpress-admin-root .ap-checkbox-group {
-	display: flex;
-	gap: 12px;
-	padding: 8px 12px;
-	background: #f8fafc;
-	border: 1px solid #e2e8f0;
-	border-radius: 8px;
+#agentpress-admin-root .ap-input:focus,
+#agentpress-admin-root .ap-select:focus {
+	outline: none;
+	border-color: #2563eb;
+	box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
 }
 
-#agentpress-admin-root .ap-checkbox-label {
+/* Segmented Scope Pills */
+#agentpress-admin-root .ap-scope-group {
+	display: inline-flex;
+	height: 34px;
+	background: #ffffff;
+	border: 1px solid #d1d5db;
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+#agentpress-admin-root .ap-scope-btn {
+	border: none;
+	border-right: 1px solid #e5e7eb;
+	background: #ffffff;
+	padding: 0 11px;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 11.5px;
+	color: #6b7280;
+	cursor: pointer;
 	display: inline-flex;
 	align-items: center;
-	gap: 6px;
-	font-size: 12px;
+	gap: 5px;
+}
+
+#agentpress-admin-root .ap-scope-btn:last-child {
+	border-right: none;
+}
+
+#agentpress-admin-root .ap-scope-btn-on {
+	background: #f3f4f6;
+	color: #111827;
 	font-weight: 600;
 }
 
-#agentpress-admin-root .ap-btn-dark,
-#agentpress-admin-root .ap-btn-primary,
-#agentpress-admin-root .ap-btn-secondary,
-#agentpress-admin-root .ap-btn-warn,
-#agentpress-admin-root .ap-btn-danger {
-	padding: 9px 14px;
-	border-radius: 8px;
+/* Buttons */
+#agentpress-admin-root .ap-btn {
+	height: 34px;
+	padding: 0 13px;
 	font-size: 13px;
-	font-weight: 600;
-	border: none;
+	font-weight: 500;
+	border-radius: 6px;
 	cursor: pointer;
-}
-
-#agentpress-admin-root .ap-btn-dark {
-	background: #0f172a;
-	color: #ffffff;
-	width: 100%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	transition: all 0.1s ease;
+	white-space: nowrap;
 }
 
 #agentpress-admin-root .ap-btn-primary {
-	background: #059669;
+	background: #111827;
 	color: #ffffff;
+	border: 1px solid #111827;
+}
+
+#agentpress-admin-root .ap-btn-primary:hover {
+	background: #1f2937;
 }
 
 #agentpress-admin-root .ap-btn-secondary {
-	background: #f1f5f9;
-	color: #334155;
+	background: #ffffff;
+	color: #374151;
+	border: 1px solid #d1d5db;
 }
 
-#agentpress-admin-root .ap-btn-warn {
-	background: #fef3c7;
-	color: #92400e;
-	padding: 4px 10px;
+#agentpress-admin-root .ap-btn-secondary:hover {
+	background: #f9fafb;
+	border-color: #9ca3af;
+}
+
+#agentpress-admin-root .ap-btn-sm {
+	height: 26px;
+	padding: 0 8px;
 	font-size: 12px;
-	margin-right: 6px;
+	border-radius: 5px;
 }
 
-#agentpress-admin-root .ap-btn-danger {
-	background: #fee2e2;
-	color: #991b1b;
-	padding: 4px 10px;
-	font-size: 12px;
+#agentpress-admin-root .ap-btn-ghost-danger {
+	background: transparent;
+	color: #dc2626;
+	border: 1px solid transparent;
 }
 
-#agentpress-admin-root .ap-alert-success {
-	background: #ecfdf5;
-	border: 2px solid #10b981;
-	padding: 18px;
-	border-radius: 12px;
-}
-
-#agentpress-admin-root .ap-alert-error {
+#agentpress-admin-root .ap-btn-ghost-danger:hover {
 	background: #fef2f2;
-	border: 1px solid #fecaca;
-	color: #b91c1c;
-	padding: 12px 16px;
-	border-radius: 8px;
-	margin-bottom: 16px;
+	border-color: #fecaca;
 }
 
-#agentpress-admin-root .ap-token-box {
-	display: flex;
-	gap: 10px;
-	margin-top: 10px;
-}
-
-#agentpress-admin-root .ap-token-code {
-	flex: 1;
-	background: #0f172a;
-	color: #34d399;
-	padding: 10px 14px;
-	border-radius: 8px;
-	font-family: monospace;
-	font-size: 13px;
-}
-
+/* Tables */
 #agentpress-admin-root .ap-table {
 	width: 100%;
 	border-collapse: collapse;
@@ -216,117 +364,221 @@
 }
 
 #agentpress-admin-root .ap-table th {
-	background: #f8fafc;
-	padding: 12px 16px;
+	padding: 10px 18px;
 	font-size: 11px;
+	font-weight: 600;
 	text-transform: uppercase;
-	color: #64748b;
-	border-bottom: 1px solid #e2e8f0;
+	letter-spacing: 0.04em;
+	color: #6b7280;
+	background: #f9fafb;
+	border-bottom: 1px solid #e5e7eb;
 }
 
 #agentpress-admin-root .ap-table td {
-	padding: 13px 16px;
-	border-bottom: 1px solid #f1f5f9;
+	padding: 12px 18px;
 	font-size: 13px;
+	color: #111827;
+	border-bottom: 1px solid #f3f4f6;
+	vertical-align: middle;
 }
 
-#agentpress-admin-root .ap-badge-perm {
-	display: inline-block;
-	background: #f1f5f9;
-	color: #334155;
-	padding: 2px 8px;
+#agentpress-admin-root .ap-table tr:last-child td {
+	border-bottom: none;
+}
+
+#agentpress-admin-root .ap-table tr:hover td {
+	background: #f9fafb;
+}
+
+#agentpress-admin-root .ap-mono {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 12px;
+	font-variant-numeric: tabular-nums;
+}
+
+#agentpress-admin-root .ap-key-chip {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 12px;
+	color: #374151;
+	background: #f3f4f6;
+	border: 1px solid #e5e7eb;
+	padding: 2px 7px;
 	border-radius: 4px;
-	font-family: monospace;
+}
+
+#agentpress-admin-root .ap-tag {
+	display: inline-block;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 	font-size: 11px;
+	color: #4b5563;
+	background: #f3f4f6;
+	padding: 1px 6px;
+	border-radius: 4px;
 	margin-right: 4px;
 }
 
-#agentpress-admin-root .ap-badge-active {
-	display: inline-block;
-	background: #d1fae5;
-	color: #065f46;
-	padding: 2px 10px;
-	border-radius: 999px;
-	font-size: 12px;
-	font-weight: 600;
+#agentpress-admin-root .ap-status-inline {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12.5px;
+	color: #374151;
 }
 
-#agentpress-admin-root .ap-badge-revoked {
-	display: inline-block;
-	background: #fee2e2;
+/* Settings Rows (Linear / Stripe style) */
+#agentpress-admin-root .ap-setting-row {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 32px;
+	padding: 20px 18px;
+	border-bottom: 1px solid #e5e7eb;
+}
+
+#agentpress-admin-root .ap-setting-row:last-child {
+	border-bottom: none;
+}
+
+#agentpress-admin-root .ap-setting-info {
+	max-width: 560px;
+}
+
+#agentpress-admin-root .ap-setting-label {
+	font-size: 13.5px;
+	font-weight: 600;
+	color: #111827;
+	margin: 0 0 4px 0;
+}
+
+#agentpress-admin-root .ap-setting-help {
+	font-size: 12.5px;
+	color: #6b7280;
+	margin: 0;
+	line-height: 1.5;
+}
+
+#agentpress-admin-root .ap-segmented {
+	display: inline-flex;
+	background: #f3f4f6;
+	padding: 3px;
+	border-radius: 7px;
+	border: 1px solid #e5e7eb;
+}
+
+#agentpress-admin-root .ap-seg-btn {
+	border: none;
+	background: transparent;
+	padding: 5px 12px;
+	font-size: 12.5px;
+	font-weight: 500;
+	color: #4b5563;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+#agentpress-admin-root .ap-seg-btn-active {
+	background: #ffffff;
+	color: #111827;
+	font-weight: 600;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* Switch Toggle */
+#agentpress-admin-root .ap-switch {
+	position: relative;
+	width: 38px;
+	height: 22px;
+	border-radius: 999px;
+	border: none;
+	cursor: pointer;
+	padding: 2px;
+	transition: background 0.15s ease;
+	flex-shrink: 0;
+}
+
+#agentpress-admin-root .ap-switch-on {
+	background: #111827;
+}
+
+#agentpress-admin-root .ap-switch-off {
+	background: #d1d5db;
+}
+
+#agentpress-admin-root .ap-switch-thumb {
+	display: block;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	background: #ffffff;
+	transition: transform 0.15s ease;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+#agentpress-admin-root .ap-switch-on .ap-switch-thumb {
+	transform: translateX(16px);
+}
+
+#agentpress-admin-root .ap-switch-off .ap-switch-thumb {
+	transform: translateX(0);
+}
+
+/* Alerts & Notices */
+#agentpress-admin-root .ap-notice {
+	padding: 10px 14px;
+	border-radius: 6px;
+	font-size: 12.5px;
+	margin-bottom: 16px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+#agentpress-admin-root .ap-notice-error {
+	background: #fef2f2;
+	border: 1px solid #fecaca;
 	color: #991b1b;
-	padding: 2px 10px;
-	border-radius: 999px;
-	font-size: 12px;
-	font-weight: 600;
 }
 
-#agentpress-admin-root .ap-code-block {
-	background: #0f172a;
-	color: #e2e8f0;
-	padding: 16px;
-	border-radius: 8px;
-	font-family: monospace;
+#agentpress-admin-root .ap-notice-ok {
+	background: #f0fdf4;
+	border: 1px solid #bbf7d0;
+	color: #166534;
+}
+
+/* Code Viewer */
+#agentpress-admin-root .ap-code-tabs {
+	display: flex;
+	gap: 4px;
+	background: #f9fafb;
+	padding: 8px 12px;
+	border-bottom: 1px solid #e5e7eb;
+	align-items: center;
+	justify-content: space-between;
+}
+
+#agentpress-admin-root .ap-pre {
+	margin: 0;
+	padding: 16px 18px;
+	background: #111827;
+	color: #e5e7eb;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 	font-size: 12px;
+	line-height: 1.6;
 	overflow-x: auto;
+	border-radius: 0 0 8px 8px;
 }
 
 #agentpress-admin-root .ap-empty {
-	padding: 32px;
+	padding: 36px 18px;
 	text-align: center;
-	color: #64748b;
+	color: #6b7280;
+	font-size: 13px;
 }
 
-#agentpress-admin-root .ap-text-right {
+#agentpress-admin-root .ap-right {
 	text-align: right;
 }
 
-#agentpress-admin-root .ap-radio-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-	gap: 14px;
-	margin-top: 8px;
+#agentpress-admin-root .ap-muted {
+	color: #6b7280;
 }
-
-#agentpress-admin-root .ap-radio-card {
-	display: block;
-	border: 2px solid #e2e8f0;
-	border-radius: 10px;
-	padding: 16px;
-	cursor: pointer;
-	background: #ffffff;
-}
-
-#agentpress-admin-root .ap-radio-card-active {
-	border-color: #059669;
-	background: #ecfdf5;
-}
-
-#agentpress-admin-root .ap-radio-header {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	font-size: 14px;
-	color: #0f172a;
-	margin-bottom: 6px;
-}
-
-#agentpress-admin-root .ap-radio-desc {
-	font-size: 12px;
-	color: #475569;
-	margin: 0;
-}
-
-#agentpress-admin-root .ap-setting-toggle {
-	padding: 14px;
-	background: #f8fafc;
-	border: 1px solid #e2e8f0;
-	border-radius: 8px;
-}
-
-#agentpress-admin-root .ap-toggle-sub {
-	font-weight: 400;
-	color: #64748b;
-	font-size: 12px;
-}
-
