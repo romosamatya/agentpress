@@ -1,0 +1,22 @@
+{
+  "name": "agentpress",
+  "version": "1.0.0",
+  "description": "AgentPress React Admin UI built with @wordpress/scripts and TailwindCSS",
+  "private": true,
+  "scripts": {
+    "build": "wp-scripts build --webpack-src-dir=src/Admin --output-path=build",
+    "start": "wp-scripts start --webpack-src-dir=src/Admin --output-path=build",
+    "lint:js": "wp-scripts lint-js src/Admin"
+  },
+  "dependencies": {
+    "@wordpress/api-fetch": "^7.0.0",
+    "@wordpress/element": "^6.0.0",
+    "@wordpress/i18n": "^5.0.0"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^30.0.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14"
+  }
+}

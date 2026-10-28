@@ -1,0 +1,282 @@
+#agentpress-admin-root .ap-container {
+	max-width: 1180px;
+	margin: 20px 20px 40px 0;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	color: #1e293b;
+}
+
+#agentpress-admin-root .ap-hero {
+	background: #0f172a;
+	color: #f8fafc;
+	padding: 24px;
+	border-radius: 12px;
+	margin-bottom: 20px;
+	box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+}
+
+#agentpress-admin-root .ap-hero-title {
+	color: #ffffff;
+	font-size: 22px;
+	font-weight: 700;
+	margin: 0 0 6px 0;
+}
+
+#agentpress-admin-root .ap-hero-subtitle {
+	color: #cbd5e1;
+	font-size: 14px;
+	margin: 0;
+}
+
+#agentpress-admin-root .ap-tabs {
+	display: flex;
+	gap: 8px;
+	border-bottom: 1px solid #cbd5e1;
+	margin-bottom: 20px;
+}
+
+#agentpress-admin-root .ap-tab {
+	padding: 10px 16px;
+	border: none;
+	background: transparent;
+	color: #475569;
+	font-weight: 600;
+	font-size: 13px;
+	cursor: pointer;
+	border-bottom: 2px solid transparent;
+}
+
+#agentpress-admin-root .ap-tab-active {
+	color: #0f172a;
+	background: #ffffff;
+	border-bottom-color: #059669;
+	border-radius: 8px 8px 0 0;
+}
+
+#agentpress-admin-root .ap-space-y > * + * {
+	margin-top: 20px;
+}
+
+#agentpress-admin-root .ap-card {
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 22px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+#agentpress-admin-root .ap-card-table {
+	padding: 0;
+	overflow: hidden;
+}
+
+#agentpress-admin-root .ap-card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 16px 22px;
+	border-bottom: 1px solid #e2e8f0;
+}
+
+#agentpress-admin-root .ap-card-title {
+	font-size: 16px;
+	font-weight: 700;
+	margin: 0;
+	color: #0f172a;
+}
+
+#agentpress-admin-root .ap-card-subtitle {
+	font-size: 13px;
+	color: #64748b;
+	margin: 4px 0 16px 0;
+}
+
+#agentpress-admin-root .ap-form-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+	gap: 16px;
+	align-items: end;
+}
+
+#agentpress-admin-root .ap-label {
+	display: block;
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #475569;
+	margin-bottom: 6px;
+}
+
+#agentpress-admin-root .ap-input,
+#agentpress-admin-root .ap-select {
+	width: 100%;
+	padding: 8px 12px;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	font-size: 13px;
+}
+
+#agentpress-admin-root .ap-checkbox-group {
+	display: flex;
+	gap: 12px;
+	padding: 8px 12px;
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+}
+
+#agentpress-admin-root .ap-checkbox-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+#agentpress-admin-root .ap-btn-dark,
+#agentpress-admin-root .ap-btn-primary,
+#agentpress-admin-root .ap-btn-secondary,
+#agentpress-admin-root .ap-btn-warn,
+#agentpress-admin-root .ap-btn-danger {
+	padding: 9px 14px;
+	border-radius: 8px;
+	font-size: 13px;
+	font-weight: 600;
+	border: none;
+	cursor: pointer;
+}
+
+#agentpress-admin-root .ap-btn-dark {
+	background: #0f172a;
+	color: #ffffff;
+	width: 100%;
+}
+
+#agentpress-admin-root .ap-btn-primary {
+	background: #059669;
+	color: #ffffff;
+}
+
+#agentpress-admin-root .ap-btn-secondary {
+	background: #f1f5f9;
+	color: #334155;
+}
+
+#agentpress-admin-root .ap-btn-warn {
+	background: #fef3c7;
+	color: #92400e;
+	padding: 4px 10px;
+	font-size: 12px;
+	margin-right: 6px;
+}
+
+#agentpress-admin-root .ap-btn-danger {
+	background: #fee2e2;
+	color: #991b1b;
+	padding: 4px 10px;
+	font-size: 12px;
+}
+
+#agentpress-admin-root .ap-alert-success {
+	background: #ecfdf5;
+	border: 2px solid #10b981;
+	padding: 18px;
+	border-radius: 12px;
+}
+
+#agentpress-admin-root .ap-alert-error {
+	background: #fef2f2;
+	border: 1px solid #fecaca;
+	color: #b91c1c;
+	padding: 12px 16px;
+	border-radius: 8px;
+	margin-bottom: 16px;
+}
+
+#agentpress-admin-root .ap-token-box {
+	display: flex;
+	gap: 10px;
+	margin-top: 10px;
+}
+
+#agentpress-admin-root .ap-token-code {
+	flex: 1;
+	background: #0f172a;
+	color: #34d399;
+	padding: 10px 14px;
+	border-radius: 8px;
+	font-family: monospace;
+	font-size: 13px;
+}
+
+#agentpress-admin-root .ap-table {
+	width: 100%;
+	border-collapse: collapse;
+	text-align: left;
+}
+
+#agentpress-admin-root .ap-table th {
+	background: #f8fafc;
+	padding: 12px 16px;
+	font-size: 11px;
+	text-transform: uppercase;
+	color: #64748b;
+	border-bottom: 1px solid #e2e8f0;
+}
+
+#agentpress-admin-root .ap-table td {
+	padding: 13px 16px;
+	border-bottom: 1px solid #f1f5f9;
+	font-size: 13px;
+}
+
+#agentpress-admin-root .ap-badge-perm {
+	display: inline-block;
+	background: #f1f5f9;
+	color: #334155;
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-family: monospace;
+	font-size: 11px;
+	margin-right: 4px;
+}
+
+#agentpress-admin-root .ap-badge-active {
+	display: inline-block;
+	background: #d1fae5;
+	color: #065f46;
+	padding: 2px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+#agentpress-admin-root .ap-badge-revoked {
+	display: inline-block;
+	background: #fee2e2;
+	color: #991b1b;
+	padding: 2px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+#agentpress-admin-root .ap-code-block {
+	background: #0f172a;
+	color: #e2e8f0;
+	padding: 16px;
+	border-radius: 8px;
+	font-family: monospace;
+	font-size: 12px;
+	overflow-x: auto;
+}
+
+#agentpress-admin-root .ap-empty {
+	padding: 32px;
+	text-align: center;
+	color: #64748b;
+}
+
+#agentpress-admin-root .ap-text-right {
+	text-align: right;
+}
