@@ -45,7 +45,7 @@ final class MarkdownConverter {
 		$text = (string) preg_replace_callback(
 			'/<pre\b[^>]*>\s*(?:<code\b[^>]*>)?(.*?)(?:<\/code>)?\s*<\/pre>/is',
 			static function ( array $matches ): string {
-				$code = html_entity_decode( strip_tags( $matches[1] ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+				$code = strip_tags( $matches[1] );
 				return "\n\n```\n" . trim( $code ) . "\n```\n\n";
 			},
 			$text
@@ -55,7 +55,7 @@ final class MarkdownConverter {
 		$text = (string) preg_replace_callback(
 			'/<code\b[^>]*>(.*?)<\/code>/is',
 			static function ( array $matches ): string {
-				$code = html_entity_decode( strip_tags( $matches[1] ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+				$code = strip_tags( $matches[1] );
 				return '`' . trim( $code ) . '`';
 			},
 			$text
