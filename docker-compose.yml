@@ -1,0 +1,78 @@
+services:
+  db:
+    image: mariadb:10.11
+    container_name: agentpress_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress_password
+      MYSQL_ROOT_PASSWORD: root_password
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  wordpress:
+    image: wordpress:php8.2-apache
+    container_name: agentpress_wp
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress_password
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DEBUG: 1
+    volumes:
+      - wp_data:/var/www/html
+      - ./:/var/www/html/wp-content/plugins/agentpress
+
+  wpcli:
+    image: wordpress:cli-php8.2
+    container_name: agentpress_wpcli
+    depends_on:
+      db:
+        condition: service_healthy
+      wordpress:
+        condition: service_started
+    user: "33:33"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress_password
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp_data:/var/www/html
+      - ./:/var/www/html/wp-content/plugins/agentpress
+    entrypoint: >
+      /bin/sh -c "
+        sleep 5;
+        if ! wp core is-installed --path=/var/www/html; then
+          wp core install \
+            --path=/var/www/html \
+            --url=http://localhost:8080 \
+            --title='AgentPress Local Lab' \
+            --admin_user=admin \
+            --admin_password=admin \
+            --admin_email=romosamatya17@gmail.com \
+            --skip-email;
+        fi;
+        wp rewrite structure '/%postname%/' --hard --path=/var/www/html;
+        wp plugin activate agentpress --path=/var/www/html;
+        wp agentpress migrate --path=/var/www/html;
+        echo '====================================================';
+        echo 'AgentPress is live at http://localhost:8080/wp-admin';
+        echo 'Username: admin | Password: admin';
+        echo '====================================================';
+      "
+
+volumes:
+  db_data:
+  wp_data:
