@@ -1,0 +1,111 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/mcp.json",
+  "name": "agentpress",
+  "version": "1.0.0",
+  "description": "AgentPress Model Context Protocol (MCP) manifest for headless WordPress RAG memory and autonomous agent workflows.",
+  "authentication": {
+    "type": "bearer",
+    "header": "Authorization",
+    "scheme": "Bearer",
+    "description": "Provide a valid AgentPress API key generated in WP Admin -> AgentPress."
+  },
+  "endpoints": {
+    "base_url": "/wp-json/agentpress/v1",
+    "memory": "/wp-json/agentpress/v1/memory",
+    "mcp_rpc": "/wp-json/agentpress/v1/mcp"
+  },
+  "tools": [
+    {
+      "name": "read_wp_memory",
+      "description": "Fetches recent WordPress content or specific post IDs formatted in token-efficient Markdown with structured metadata (Author, Citations, Review Date) for RAG ingestion.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "post_id": {
+            "type": "integer",
+            "description": "Optional specific WordPress Post ID to fetch."
+          },
+          "post_type": {
+            "type": "string",
+            "default": "post",
+            "description": "WordPress post type slug (e.g., 'post', 'page')."
+          },
+          "limit": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Maximum number of records to return."
+          },
+          "offset": {
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "description": "Number of records to skip for pagination."
+          },
+          "category": {
+            "type": "string",
+            "description": "Optional category slug or ID filter."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "write_wp_draft",
+      "description": "Pushes generated Markdown content and structured metadata into a new or existing WordPress post draft.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["title", "content_markdown"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Optional existing Post ID to update."
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the WordPress post."
+          },
+          "content_markdown": {
+            "type": "string",
+            "description": "Clean Markdown body content for the post."
+          },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "publish", "pending", "private"],
+            "default": "draft",
+            "description": "Publication status (defaults to 'draft')."
+          },
+          "post_type": {
+            "type": "string",
+            "default": "post",
+            "description": "Target WordPress post type."
+          },
+          "meta": {
+            "type": "object",
+            "description": "Structured metadata fields for AI provenance and citations.",
+            "properties": {
+              "author": {
+                "type": "string",
+                "description": "Explicit author or agent identifier."
+              },
+              "citations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of source URLs or citation references."
+              },
+              "review_date": {
+                "type": "string",
+                "description": "ISO-8601 review date (YYYY-MM-DD)."
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  ]
+}
