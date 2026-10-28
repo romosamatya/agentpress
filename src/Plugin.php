@@ -15,8 +15,10 @@ use AgentPress\API\McpController;
 use AgentPress\API\MemoryController;
 use AgentPress\Auth\Authenticator;
 use AgentPress\Auth\TokenManager;
+use AgentPress\CLI\AgentPressCommand;
 use AgentPress\Database\Logger;
 use AgentPress\Database\Migrator;
+use WP_CLI;
 
 /**
  * Class Plugin
@@ -91,6 +93,12 @@ final class Plugin {
 		if ( is_admin() ) {
 			$admin_menu = new AdminMenu();
 			$admin_menu->register();
+		}
+
+		if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( 'WP_CLI' ) ) {
+			$memory_controller = new MemoryController( $this->authenticator, $this->logger );
+			$cli_command       = new AgentPressCommand( $this->token_manager, $this->logger, $memory_controller );
+			WP_CLI::add_command( 'agentpress', $cli_command );
 		}
 	}
 

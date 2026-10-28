@@ -111,3 +111,34 @@ The plugin exposes the following system tools to MCP-compatible agents via `mcp.
 - Always enforce strict typing at the top of every PHP file (`declare(strict_types=1);`).
 - Namespace all core classes under `AgentPress\`.
 - Thoroughly document all hooks, filters, and API endpoints using standard PHPDoc blocks.
+
+---
+
+## 5. WP-CLI Terminal Management Reference
+
+AgentPress registers the `wp agentpress` command suite for terminal-first workflows:
+
+```bash
+# Run or verify custom database table migrations (wp_agentpress_keys & wp_agentpress_logs)
+wp agentpress migrate
+
+# Generate a new API key for a WordPress Agent User
+wp agentpress key-generate "Antigravity MCP Agent" --user=admin --permissions=read,write
+
+# Output only the raw key token for CI/CD or shell scripts
+export AGENTPRESS_KEY=$(wp agentpress key-generate "CI Worker" --user=1 --porcelain)
+
+# List all API keys (supports --status=active|revoked|all and --format=table|json|csv|yaml)
+wp agentpress key-list
+
+# Revoke or permanently delete an API key by ID
+wp agentpress key-revoke 1
+wp agentpress key-revoke 1 --delete
+
+# Inspect recent AI agent audit logs
+wp agentpress logs --limit=25
+
+# Preview posts converted to token-efficient Markdown for RAG ingestion
+wp agentpress memory --post_type=post --limit=5 --format=json
+```
+
